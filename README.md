@@ -1,5 +1,7 @@
 # Adversarial examples
 
+Misclassifying `2` as `6`:
+
 ![alt text](https://image.ibb.co/e6FAV6/final.png "Sample visualization")
 
 (Samples were chosen randomly from the set of successfully misclassified examples)
