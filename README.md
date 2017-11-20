@@ -2,6 +2,8 @@
 
 ![alt text](https://image.ibb.co/e6FAV6/final.png "Sample visualization")
 
+(Samples were chosen randomly from the set of successfully misclassified examples)
+
 ## Instructions
 1) Train a simple CNN on mnist by running `python train.py`. You should see an output similar to `Test accuracy 0.9853`. The model is now saved under `./data/mnist_conv/`.
 2) Generate adversarial samples for the model in first step. For example,
