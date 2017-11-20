@@ -14,6 +14,7 @@
 - Values outside of [0, 1] are clipped to make the adversarial examples more interesting.
 
 ## TODO
+- (Important) Fix the image difference visualization as it is not representing the decreased pixel insentities correctly
 - Reproduce [saliency map][2] based approach
 - Look into retraining the targeted net with adversarial examples
 - Look into Hessian (or other curvature) based targeted attacks
