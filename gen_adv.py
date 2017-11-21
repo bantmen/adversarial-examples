@@ -65,45 +65,45 @@ def save_visualization(victim_x, modified_x):
 maybe_print(
     'Will create adversarial samples of {} to be misclassified as {}'.format(args.victim_class, args.wanted_class))
 
-with tf.Session() as sess:
-    saver = tf.train.import_meta_graph('{}.meta'.format(MODEL_PATH))
-    saver.restore(sess, MODEL_PATH)
-    x_, x, y, is_training, logits, pred, accuracy = get_convnet_tensors()
-    adv_targeted, adv_eps, adv_x, adv_y = add_adversarial_segment(x, logits)
+sess = tf.InteractiveSession()
+saver = tf.train.import_meta_graph('{}.meta'.format(MODEL_PATH))
+saver.restore(sess, MODEL_PATH)
+x_, x, y, is_training, logits, pred, accuracy = get_convnet_tensors()
+adv_targeted, adv_eps, adv_x, adv_y = add_adversarial_segment(x, logits)
 
-    mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-    maybe_print('Test accuracy %g' % accuracy.eval(feed_dict={
-        x_: mnist.test.images, y: mnist.test.labels, is_training: False}))
-    test_pred = pred.eval(feed_dict={x_: mnist.test.images, is_training: False})
+mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
+maybe_print('Test accuracy %g' % accuracy.eval(feed_dict={
+    x_: mnist.test.images, y: mnist.test.labels, is_training: False}))
+test_pred = pred.eval(feed_dict={x_: mnist.test.images, is_training: False})
 
-    current_class, wanted_class = args.victim_class, args.wanted_class
+current_class, wanted_class = args.victim_class, args.wanted_class
 
-    # Only pick samples of the victim class that the net was able to classify correctly
-    victim_mask = np.argmax(mnist.test.labels, axis=1) == current_class
-    victim_mask &= test_pred == current_class
-    victim_x, victim_y = mnist.test.images[victim_mask], mnist.test.labels[victim_mask]
-    num_victims = victim_x.shape[0]
-    maybe_print('Total num victim samples:', num_victims)
+# Only pick samples of the victim class that the net was able to classify correctly
+victim_mask = np.argmax(mnist.test.labels, axis=1) == current_class
+victim_mask &= test_pred == current_class
+victim_x, victim_y = mnist.test.images[victim_mask], mnist.test.labels[victim_mask]
+num_victims = victim_x.shape[0]
+maybe_print('Total num victim samples:', num_victims)
 
-    modified_x = victim_x
-    wanted_y = [wanted_class] * num_victims
-    # NOTE: Keep in mind that successfully misclassified samples are no longer distorted
-    for i in xrange(args.num_iterations):
-        modified_x, predicted_classes = sess.run([adv_x, pred], feed_dict={
-            x_: modified_x,
-            adv_targeted: True,
-            adv_eps: 0.01,
-            adv_y: wanted_y,
-            is_training: False
-        })
-        i += 1
-        maybe_print('Iteration:', i, end=', ')
-        maybe_print('Misclassification rate:', np.sum(predicted_classes != current_class) / float(num_victims), end=', ')
-        maybe_print('Targeted misclassification rate:', np.sum(predicted_classes == wanted_class) / num_victims)
+modified_x = victim_x
+wanted_y = [wanted_class] * num_victims
+# NOTE: Keep in mind that successfully misclassified samples are no longer distorted
+for i in xrange(args.num_iterations):
+    modified_x, predicted_classes = sess.run([adv_x, pred], feed_dict={
+        x_: modified_x,
+        adv_targeted: True,
+        adv_eps: 0.01,
+        adv_y: wanted_y,
+        is_training: False
+    })
+    i += 1
+    maybe_print('Iteration:', i, end=', ')
+    maybe_print('Misclassification rate:', np.sum(predicted_classes != current_class) / float(num_victims), end=', ')
+    maybe_print('Targeted misclassification rate:', np.sum(predicted_classes == wanted_class) / num_victims)
 
-    # Only visualize the succesful adversarial examples
-    success_mask = predicted_classes == wanted_class
-    victim_x, modified_x = victim_x[success_mask], modified_x[success_mask]
+# Only visualize the succesful adversarial examples
+success_mask = predicted_classes == wanted_class
+victim_x, modified_x = victim_x[success_mask], modified_x[success_mask]
 
-    maybe_print('Creating and saving the visualizations for {} randomly chosen samples.'.format(args.num_viz_samples))
-    save_visualization(*pick_k(args.num_viz_samples, victim_x, modified_x))
+maybe_print('Creating and saving the visualizations for {} randomly chosen samples.'.format(args.num_viz_samples))
+save_visualization(*pick_k(args.num_viz_samples, victim_x, modified_x))

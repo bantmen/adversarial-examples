@@ -79,7 +79,7 @@ def add_adversarial_segment(x, logits):
     # Don't distort the samples that are already misclassified as intended
     already_adversarial = tf.equal(tf.argmax(logits, 1), tf.cast(adv_y, tf.int64))
     already_adversarial = tf.cast(tf.logical_not(already_adversarial), tf.float32)
-    adv_perturbation_mask = tf.tile(tf.reshape(already_adversarial, [-1, 1, 1, 1]), [1, 28, 28, 1])
+    adv_perturbation_mask = tf.tile(tf.reshape(already_adversarial, [-1, 1, 1, 1]), [1] + x.shape[1:].as_list())
     adv_perturbation = adv_perturbation * adv_perturbation_mask
 
     adv_x = tf.clip_by_value(x + adv_perturbation, 0.0, 1.0)
