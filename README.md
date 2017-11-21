@@ -1,6 +1,10 @@
 # Adversarial examples
 
+Misclassifying `2` as `6`:
+
 ![alt text](https://image.ibb.co/e6FAV6/final.png "Sample visualization")
+
+(Samples were chosen randomly from the set of successfully misclassified examples)
 
 ## Instructions
 1) Train a simple CNN on mnist by running `python train.py`. You should see an output similar to `Test accuracy 0.9853`. The model is now saved under `./data/mnist_conv/`.
@@ -14,6 +18,7 @@
 - Values outside of [0, 1] are clipped to make the adversarial examples more interesting.
 
 ## TODO
+- (Important) Fix the image difference visualization as it is not representing the decreased pixel insentities correctly
 - Reproduce [saliency map][2] based approach
 - Look into retraining the targeted net with adversarial examples
 - Look into Hessian (or other curvature) based targeted attacks
